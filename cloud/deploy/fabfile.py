@@ -2,6 +2,7 @@ from fabric.api import *
 from fabric.colors import green
 from fabric.colors import red
 from fabenvs import *
+from webserver import nginx
 
 
 @roles('webserver_python')
@@ -11,7 +12,8 @@ def webserver_python(build_key, build_number):
         return
 
     print green("INSTALLING PYTHON WEB_SERVER...")
-    sudo("ls -l")
+    nginx.deploy()
+    print green(output)
     print green("PYTHON WEB_SERVER TASK COMPLETED")
 
 
