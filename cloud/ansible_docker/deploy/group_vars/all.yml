@@ -1,0 +1,20 @@
+---
+# file: group_vars/all.yml
+
+# Common settings
+containers_dir: ../
+
+# Application settings
+app_version: "{{ version }}"
+app_name: echo_service
+app_packages:
+  - mock
+  - pip
+  - blist
+  - pycurl
+  - strict_rfc3339
+  - tornado
+app_src_dir: "{{ containers_dir }}/python_app"
+
+# Docker settings
+docker_api_version: "1.18"

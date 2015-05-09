@@ -1,0 +1,18 @@
+---
+# file: int/group_vars/all.yml
+
+# Application settings
+app_logger_level: DEBUG
+app_proxy_enabled: False
+# app_proxy_host: http://proxy.com
+# app_proxy_port: 9999
+
+# Ansible settings
+ansible_connection: local
+proxy_env:
+  http_proxy: http://proxy.com:9999
+  https_proxy: http://proxy.com:9999
+remote_user: "{{ ansible_user_id }}"
+
+# Environment settings
+environment_name: int

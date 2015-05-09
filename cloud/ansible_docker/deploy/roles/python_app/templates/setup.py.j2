@@ -1,0 +1,28 @@
+# {{ ansible_managed }}
+'''{{ app_name }} package setup'''
+import os
+
+from setuptools import setup
+from setuptools import find_packages
+
+
+PWD = os.path.dirname(os.path.realpath(__file__))
+
+
+setup(
+    name='{{ app_name }}',
+    version='{{ app_version }}',
+    packages=find_packages(PWD, exclude=[]),
+    install_requires=[
+{% if app_packages is defined %}
+{% for pkg in app_packages %}
+        '{{ pkg }}',
+{% endfor %}
+{% endif %}
+    ],
+    entry_points={
+        'console_scripts': [
+            '{{ app_name }} = backend.service.run:main',
+        ],
+    },
+)

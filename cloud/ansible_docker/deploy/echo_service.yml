@@ -1,0 +1,6 @@
+---
+# file: echo_service.yml
+
+- include: app_builder.yml
+- include: image_builder.yml
+- include: container_runner.yml

@@ -1,0 +1,50 @@
+---
+# file: image_builder.yml
+
+# Log data image
+- hosts: webservers
+  gather_facts: false
+  tasks:
+    - name: Check or build log data image
+      docker_image:
+        docker_url: unix://var/run/docker.sock
+        name: egmf/log_data
+        path: ../log_data
+        state: present
+        tag: "{{ app_version }}"
+
+# Cache image
+- hosts: webservers
+  gather_facts: false
+  tasks:
+    - name: Check or build cache image
+      docker_image:
+        docker_url: unix://var/run/docker.sock
+        name: egmf/redis
+        path: ../redis
+        state: present
+        tag: "{{ app_version }}"
+
+# Web application image
+- hosts: webservers
+  gather_facts: false
+  tasks:
+    - name: Check or build application image
+      docker_image:
+        docker_url: unix://var/run/docker.sock
+        name: egmf/echo_service
+        path: ../python_app
+        state: present
+        tag: "{{ app_version }}"
+
+# Reverse proxy image
+- hosts: webservers
+  gather_facts: false
+  tasks:
+    - name: Check or build application image
+      docker_image:
+        docker_url: unix://var/run/docker.sock
+        name: egmf/nginx
+        path: ../nginx
+        state: present
+        tag: "{{ app_version }}"

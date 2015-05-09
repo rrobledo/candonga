@@ -1,0 +1,61 @@
+# {{ ansible_managed }}
+'''Application settings'''
+import os
+
+# Application settings
+APP_NAME = '{{ app_name }}'
+APP_ERR_CODE_PREFIX = APP_NAME
+APP_UUID_LENGTH = 32 # Bytes
+
+{% if proxy_enabled is defined %}
+PROXY_ENABLED = {{ app_proxy_enabled }}
+PROXY_HOST = '{{ app_proxy_host }}'
+PROXY_PORT = {{ app_proxy_port }}
+{% else %}
+PROXY_ENABLED = False
+{% endif %}
+
+# Logger settings
+LOGGER_LEVEL = '{{ app_logger_level }}'
+LOGGER_PATH = os.path.dirname(os.path.realpath(__file__))
+LOGGER_CONFIG = {
+    'version': 1,
+    'formatters': {
+        'json_basic': {
+            'format': ('{"timestamp" : "%(asctime)s", '
+                       '"level" : "%(levelname)s", "message" : "%(message)s"}'),
+            'datefmt': None,
+        },
+        'json_verbose': {
+            'format': ('{"timestamp" : "%(asctime)s", "trxId" : "%(trxId)s", '
+                       '"level" : "%(levelname)s", '
+                       '"pathname" : "%(pathname)s", "module" : "%(module)s",'
+                       '"lineno" : "%(lineno)d", "message" : "%(message)s"}'),
+            'datefmt': None,
+        },
+    },
+    'handlers': {
+        'stdout': {
+            'class': 'logging.StreamHandler',
+            'level': LOGGER_LEVEL,
+            'formatter': 'json_basic',
+            'stream': 'ext://sys.stdout',
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(
+                LOGGER_PATH, '{srv}.log'.format(srv=APP_NAME)),
+            'level': LOGGER_LEVEL,
+            'formatter': 'json_verbose',
+            'maxBytes': 104857600,
+            'backupCount': 10,
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+    },
+    'root': {
+        'level': LOGGER_LEVEL,
+        'handlers': ['stdout', ],
+    },
+}
