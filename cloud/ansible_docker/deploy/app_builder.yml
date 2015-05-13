@@ -1,0 +1,6 @@
+---
+# file: app_builder.yml
+
+- hosts: webservers
+  roles:
+    - python_app

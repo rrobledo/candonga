@@ -1,0 +1,64 @@
+---
+# file: site.yml
+
+# Log data container
+- hosts: webservers
+  gather_facts: False
+  tasks:
+    - name: Create or reload log data container
+      docker:
+        docker_api_version: "{{ docker_api_version }}"
+        docker_url: unix://var/run/docker.sock
+        image: egmf/log_data:{{ app_version }}
+        name: data_log
+        state: present
+
+# Cache container
+- hosts: webservers
+  gather_facts: False
+  tasks:
+    - name: Create or reload cache container
+      docker:
+        docker_api_version: "{{ docker_api_version }}"
+        docker_url: unix://var/run/docker.sock
+        image: egmf/redis:{{ app_version }}
+        name: cache_echo
+        restart_policy: on-failure
+        state: reloaded
+
+# Web application container
+- hosts: webservers
+  gather_facts: False
+  tasks:
+    - name: Create or reload web application container
+      docker:
+        docker_api_version: "{{ docker_api_version }}"
+        docker_url: unix://var/run/docker.sock
+        image: egmf/echo_service:{{ app_version }}
+        links:
+          - cache_echo
+        name: webapp_echo_{{ item }}
+        restart_policy: on-failure
+        state: reloaded
+        volumes_from:
+          - data_log
+      with_sequence: count=3
+
+# Reverse proxy
+- hosts: webservers
+  gather_facts: False
+  tasks:
+    - name: Create or reload reverse proxy container
+      docker:
+        docker_api_version: "{{ docker_api_version }}"
+        docker_url: unix://var/run/docker.sock
+        image: egmf/nginx:{{ app_version }}
+        links:
+          - webapp_echo_1
+          - webapp_echo_2
+          - webapp_echo_3
+        name: reverse_proxy_echo
+        ports:
+          - "80:80"
+        restart_policy: on-failure
+        state: reloaded

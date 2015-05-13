@@ -1,0 +1,20 @@
+---
+# file: roles/python_app/tasks/main.yml
+
+- name: Create the application setting.py file
+  local_action:
+    template
+    src=settings.py.j2
+    dest={{ app_src_dir }}/backend/backend/app/settings.py
+
+- name: Create the application setup.py file
+  local_action:
+    template
+    src=setup.py.j2
+    dest={{ app_src_dir }}/backend/setup.py
+
+- name: Build the application package
+  local_action:
+    command
+    python setup.py sdist
+    chdir={{ app_src_dir }}/backend
